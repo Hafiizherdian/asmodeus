@@ -38,6 +38,49 @@ def initialize_gemini(api_key):
     
     return chat
 
+def format_response(text):
+    """Format the response with proper spacing and markdown"""
+    formatted_lines = []
+    current_question = []
+    
+    lines = text.split('\n')
+    in_question = False
+    
+    for line in lines:
+        line = line.strip()
+        if line:  # if line is not empty
+            if line.startswith(('A.', 'B.')):  # Section headers
+                if current_question:
+                    formatted_lines.append('\n'.join(current_question))
+                    formatted_lines.append('\n')
+                    current_question = []
+                formatted_lines.append(f"### {line}\n")
+            elif line[0].isdigit() and '. ' in line:  # New question
+                if current_question:
+                    formatted_lines.append('\n'.join(current_question))
+                    formatted_lines.append('\n')
+                    current_question = []
+                # Split the line at first colon if it exists
+                if ': ' in line:
+                    num, rest = line.split(': ', 1)
+                    current_question.append(f"**{num} Pertanyaan:** {rest}\n")
+                else:
+                    current_question.append(f"**{line}**\n")
+                in_question = True
+            elif line.lower().startswith('jawaban'):  # Answer line
+                in_question = False
+                current_question.append('\n**' + line + '**')
+            elif in_question and line[0].isalpha() and line[1] == '.':  # Options
+                current_question.append(f"\n{line}")  # Added newline before each option
+            else:  # Other content
+                current_question.append(line)
+    
+    # Add the last question if exists
+    if current_question:
+        formatted_lines.append('\n'.join(current_question))
+    
+    return '\n\n'.join(formatted_lines)
+
 def main():
     st.title("Generator Soal dengan AI")
     
@@ -81,24 +124,29 @@ def main():
                    b. [Pilihan B]
                    c. [Pilihan C]
                    d. [Pilihan D]
+
                    Jawaban: [Jawaban yang benar]
 
                 B. Soal Esai Singkat
                 1. [Pertanyaan]
+
                    Jawaban: [Jawaban yang benar]
                 """
                 
                 # Generate response
                 response = st.session_state.chat_session.send_message(prompt)
                 
+                # Format and display response
+                formatted_response = format_response(response.text)
+                
                 # Display response
                 st.subheader("Hasil Generate:")
-                st.write(response.text)
+                st.markdown(formatted_response)
                 
                 # Download button for results
                 st.download_button(
                     label="Download Hasil",
-                    data=response.text,
+                    data=formatted_response,
                     file_name="hasil_generate_soal.txt",
                     mime="text/plain"
                 )
