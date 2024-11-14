@@ -8,7 +8,7 @@ st.set_page_config(page_title="Generator Soal AI", layout="wide")
 if 'chat_session' not in st.session_state:
     st.session_state.chat_session = None
 if 'api_key' not in st.session_state:
-    st.session_state.api_key = "AIzaSyCojCOhDRd6xGT0oTsbEaL2MJ0r4MFQooE"
+    st.session_state.api_key = None
 
 def initialize_gemini(api_key):
     # Configure API
@@ -20,17 +20,23 @@ def initialize_gemini(api_key):
         "top_p": 0.95,
         "top_k": 40,
         "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
     }
     
     # Create model
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash",
         generation_config=generation_config,
-        system_instruction="generate pertanyaan dan jawaban berdasarkan teks yang di berikan. jenis pertanyaan dan jawaban bisa berupa pilhan ganda dan esai singkat"
     )
     
-    return model
+    # Start chat with system prompt
+    chat = model.start_chat(history=[])
+    chat.send_message(
+        "Anda adalah asisten yang akan generate pertanyaan dan jawaban berdasarkan teks yang diberikan. "
+        "Jenis pertanyaan dan jawaban bisa berupa pilihan ganda dan esai singkat. "
+        "Selalu berikan output dalam format yang rapi dengan nomor urut untuk setiap soal."
+    )
+    
+    return chat
 
 def main():
     st.title("Generator Soal dengan AI")
@@ -38,6 +44,9 @@ def main():
     # Sidebar untuk input API key
     with st.sidebar:
         st.header("Pengaturan")
+        api_key = st.text_input("Masukkan API Key Google", type="password")
+        if api_key:
+            st.session_state.api_key = api_key
         
         if st.button("Reset Chat"):
             st.session_state.chat_session = None
@@ -59,11 +68,31 @@ def main():
             try:
                 # Initialize model if not already done
                 if st.session_state.chat_session is None:
-                    model = initialize_gemini(st.session_state.api_key)
-                    st.session_state.chat_session = model.start_chat(history=[])
+                    st.session_state.chat_session = initialize_gemini(st.session_state.api_key)
+                
+                # Prepare prompt
+                prompt = f"""
+                Berdasarkan teks berikut, buatkan soal-soal beserta jawabannya:
+
+                {user_input}
+
+                Buatkan kombinasi soal pilihan ganda dan esai singkat. 
+                Format output:
+                A. Soal Pilihan Ganda
+                1. [Pertanyaan]
+                   a. [Pilihan A]
+                   b. [Pilihan B]
+                   c. [Pilihan C]
+                   d. [Pilihan D]
+                   Jawaban: [Jawaban yang benar]
+
+                B. Soal Esai Singkat
+                1. [Pertanyaan]
+                   Jawaban: [Jawaban yang benar]
+                """
                 
                 # Generate response
-                response = st.session_state.chat_session.send_message(user_input)
+                response = st.session_state.chat_session.send_message(prompt)
                 
                 # Display response
                 st.subheader("Hasil Generate:")
