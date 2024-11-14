@@ -44,9 +44,6 @@ def main():
     # Sidebar untuk input API key
     with st.sidebar:
         st.header("Pengaturan")
-        api_key = st.text_input("Masukkan API Key Google", type="password")
-        if api_key:
-            st.session_state.api_key = api_key
         
         if st.button("Reset Chat"):
             st.session_state.chat_session = None
