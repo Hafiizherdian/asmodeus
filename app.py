@@ -82,7 +82,7 @@ def format_response(text):
     return '\n\n'.join(formatted_lines)
 
 def main():
-    st.title("Generator Soal dengan AI")
+    st.title("HERD :owl:")
     
     # Sidebar untuk input API key
     with st.sidebar:
