@@ -8,7 +8,7 @@ st.set_page_config(page_title="Generator Soal AI", layout="wide")
 if 'chat_session' not in st.session_state:
     st.session_state.chat_session = None
 if 'api_key' not in st.session_state:
-    st.session_state.api_key = None
+    st.session_state.api_key = "AIzaSyCojCOhDRd6xGT0oTsbEaL2MJ0r4MFQooE"
 
 def initialize_gemini(api_key):
     # Configure API
