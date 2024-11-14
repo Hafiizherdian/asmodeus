@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # Set page config
-st.set_page_config(page_title="Generator Soal AI", layout="wide")
+st.set_page_config(page_title="Implementasi AI Generate butir soal otomatis", layout="wide")
 
 # Initialize session state
 if 'chat_session' not in st.session_state:
