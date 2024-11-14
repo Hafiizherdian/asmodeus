@@ -63,7 +63,7 @@ def format_response(text):
                 # Split the line at first colon if it exists
                 if ': ' in line:
                     num, rest = line.split(': ', 1)
-                    current_question.append(f"**{num} Pertanyaan:** {rest}\n")
+                    current_question.append(f"\n**{num} Pertanyaan:** {rest}\n")
                 else:
                     current_question.append(f"**{line}**\n")
                 in_question = True
@@ -73,7 +73,7 @@ def format_response(text):
             elif in_question and line[0].isalpha() and line[1] == '.':  # Options
                 current_question.append(f"\n{line}")  # Added newline before each option
             else:  # Other content
-                current_question.append(line)
+                current_question.append(f"\n{line}\n")
     
     # Add the last question if exists
     if current_question:
