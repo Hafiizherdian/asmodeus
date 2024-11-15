@@ -1,6 +1,7 @@
 # Implementasi AI untuk Generate Butir Soal Otomatis 📚🤖
 
 Proyek ini bertujuan untuk mengembangkan aplikasi berbasis AI yang dapat menghasilkan butir soal otomatis (pilihan ganda dan esai singkat) berdasarkan teks yang diberikan. Aplikasi ini menggunakan **Streamlit** sebagai antarmuka pengguna dan model generatif dari **Google Generative AI**.
+- https://asmodeus-ebyvso2ih6phhgr5gvjappn.streamlit.app/
 
 ---
 
