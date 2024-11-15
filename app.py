@@ -7,36 +7,46 @@ st.set_page_config(page_title="Implementasi AI Generate butir soal otomatis", la
 # Initialize session state
 if 'chat_session' not in st.session_state:
     st.session_state.chat_session = None
-if 'api_key' not in st.session_state:
-    st.session_state.api_key = None
 
-def initialize_gemini(api_key):
-    # Configure API
-    genai.configure(api_key=api_key)
-    
-    # Model configuration
-    generation_config = {
-        "temperature": 1,
-        "top_p": 0.95,
-        "top_k": 40,
-        "max_output_tokens": 8192,
-    }
-    
-    # Create model
-    model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        generation_config=generation_config,
-    )
-    
-    # Start chat with system prompt
-    chat = model.start_chat(history=[])
-    chat.send_message(
-        "Anda adalah asisten yang akan generate pertanyaan dan jawaban berdasarkan teks yang diberikan. "
-        "Jenis pertanyaan dan jawaban bisa berupa pilihan ganda dan esai singkat. "
-        "Selalu berikan output dalam format yang rapi dengan nomor urut untuk setiap soal."
-    )
-    
-    return chat
+def initialize_gemini():
+    try:
+        # Cek apakah API key ada di secrets
+        if "GOOGLE_API_KEY" not in st.secrets:
+            st.error("API Key tidak ditemukan. Silakan tambahkan API Key di Streamlit Secrets.")
+            return None
+        
+        # Mengambil API key dari secrets
+        api_key = st.secrets["GOOGLE_API_KEY"]
+        
+        # Configure API
+        genai.configure(api_key=api_key)
+        
+        # Model configuration
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 40,
+            "max_output_tokens": 8192,
+        }
+        
+        # Create model
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            generation_config=generation_config,
+        )
+        
+        # Start chat with system prompt
+        chat = model.start_chat(history=[])
+        chat.send_message(
+            "Anda adalah asisten yang akan generate pertanyaan dan jawaban berdasarkan teks yang diberikan. "
+            "Jenis pertanyaan dan jawaban bisa berupa pilihan ganda dan esai singkat. "
+            "Selalu berikan output dalam format yang rapi dengan nomor urut untuk setiap soal."
+        )
+        
+        return chat
+    except Exception as e:
+        st.error(f"Error initializing Gemini: {str(e)}")
+        return None
 
 def format_response(text):
     """Format the response with proper spacing and markdown"""
@@ -84,13 +94,17 @@ def format_response(text):
 def main():
     st.title("HERD :owl:")
     
-    # Sidebar untuk input API key
+    # Sidebar untuk pengaturan
     with st.sidebar:
         st.header("Pengaturan")
         
         if st.button("Reset Chat"):
             st.session_state.chat_session = None
             st.experimental_rerun()
+            
+        # Debug info
+        if st.checkbox("Show Debug Info"):
+            st.write("Available secrets:", list(st.secrets.keys()))
     
     # Main content
     st.write("Masukkan teks untuk generate soal:")
@@ -100,15 +114,14 @@ def main():
     
     # Generate button
     if st.button("Generate Soal"):
-        if not st.session_state.api_key:
-            st.error("Mohon masukkan API Key terlebih dahulu!")
-            return
-            
         if user_input:
             try:
                 # Initialize model if not already done
                 if st.session_state.chat_session is None:
-                    st.session_state.chat_session = initialize_gemini(st.session_state.api_key)
+                    st.session_state.chat_session = initialize_gemini()
+                    if st.session_state.chat_session is None:
+                        st.error("Gagal menginisialisasi model. Mohon periksa API key di Streamlit Secrets.")
+                        return
                 
                 # Prepare prompt
                 prompt = f"""
@@ -154,7 +167,7 @@ def main():
             except Exception as e:
                 st.error(f"Terjadi kesalahan: {str(e)}")
                 if "invalid api key" in str(e).lower():
-                    st.error("API Key tidak valid. Mohon periksa kembali API Key Anda.")
+                    st.error("API Key tidak valid. Mohon periksa kembali API Key di Streamlit Secrets.")
         else:
             st.warning("Mohon masukkan teks terlebih dahulu!")
 
