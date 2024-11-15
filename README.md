@@ -61,13 +61,14 @@ Proyek ini bertujuan untuk mengembangkan aplikasi berbasis AI yang dapat menghas
 ---
 
 ## Struktur Folder 📂
+```console
 asmodeus/
-- ├── app.py                 ***# File utama aplikasi***
-- ├── requirements.txt       ***# Dependensi Python***
+- ├── app.py                 # File utama aplikasi
+- ├── requirements.txt       # Dependensi Python
 - ├── .streamlit/
-- │   └── secrets.toml       ***# File API Key (lokal)***
-- ├── README.md              ***# Dokumentasi***
-
+- │   └── secrets.toml       # File API Key (lokal)
+- ├── README.md              # Dokumentasi
+```
 ---
 
 ## Masalah Umum ❗
