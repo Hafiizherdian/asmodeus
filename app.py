@@ -8,7 +8,7 @@ st.set_page_config(page_title="Implementasi AI Generate butir soal otomatis", la
 if 'chat_session' not in st.session_state:
     st.session_state.chat_session = None
 if 'api_key' not in st.session_state:
-    st.session_state.api_key = "api_key"
+    st.session_state.api_key = "API_KEY"
 
 def initialize_gemini(api_key):
     # Configure API
