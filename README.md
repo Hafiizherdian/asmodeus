@@ -24,24 +24,30 @@ Proyek ini bertujuan untuk mengembangkan aplikasi berbasis AI yang dapat menghas
 
 ### 1. Menjalankan di Lokal
 1. **Clone repositori**:
+    ```console
     - git clone https://github.com/Hafiizherdian/asmodeus.git
     - cd asmodeus
+    ```
 2. **Buat virtual environment**:
+    ```console
     - python -m venv venv
     - source venv/bin/activate  # Untuk Linux/Mac
     - venv\Scripts\activate     # Untuk Windows
+    ```
 
 3. **Instal dependensi**:
+    ```console
     - pip install -r requirements.txt
-
+    ```
 4. **Tambahkan file `secrets.toml` : Buat folder `.streamlit` di direktori utama, lalu buat file `secrets.toml`**:
     - [GOOGLE_API_KEY]
     - GOOGLE_API_KEY = "YOUR_API_KEY"
     - ❗ API dapatkan di https://aistudio.google.com/apikey
 
 5. **Jalankan aplikasi**:
+    ```console
     - streamlit run app.py
-
+    ```
 ### 2. Menjalankan di Streamlit Cloud
 1. **Upload project ke GitHub.**
 
