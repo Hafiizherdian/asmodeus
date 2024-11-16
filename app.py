@@ -55,21 +55,23 @@ def format_response(text):
     Hasilkan soal pilihan ganda dan esai dengan format rapi Pilihan jawaban pilihan ganda berada dibawah soal dan pisahkan antar pilihan dengan jarak 1 line.
     Beri jarak 2 line antara soal dan jawaban esai.
     Format output:
-                A. Soal Pilihan Ganda
-                1. [Pertanyaan]
-                   a. [Pilihan A]
-                   b. [Pilihan B]
-                   c. [Pilihan C]
-                   d. [Pilihan D]
+                A. Soal Pilihan Ganda\n
+                1. [Pertanyaan]\n
+                   a. [Pilihan A]\n
+                   b. [Pilihan B]\n
+                   c. [Pilihan C]\n
+                   d. [Pilihan D]\n
 
                    
 
-                B. Soal Esai Singkat
-                1. [Pertanyaan]
+                B. Soal Esai Singkat\n
+                1. [Pertanyaan]\n
 
-                C. Kunci Jawaban
-                   Jawaban Pilihan Ganda: [Jawaban yang benar]
-                   Jawaban Pilihan Esai: [Jawaban yang benar]
+                C. Kunci Jawaban\n
+                   Jawaban Pilihan Ganda:\n 
+                   [Jawaban yang benar]\n
+                   Jawaban Pilihan Esai:\n 
+                   [Jawaban yang benar]\n
     """
     
     return text
