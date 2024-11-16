@@ -5,6 +5,8 @@ import google.generativeai as genai
 st.set_page_config(page_title="Implementasi AI Generate butir soal otomatis", layout="wide")
 
 # Initialize session state
+if 'chat_history' not in st.session_state or not isinstance(st.session_state.chat_history, list):
+    st.session_state.chat_history = []
 if 'chat_session' not in st.session_state:
     st.session_state.chat_session = None
 
@@ -49,88 +51,10 @@ def initialize_gemini():
         return None
 
 def format_response(text):
-    """Format the response with proper spacing and markdown"""
-    formatted_lines = []
-    current_question = []
-    
-    lines = text.split('\n')
-    in_question = False
-    
-    for line in lines:
-        line = line.strip()
-        if line:  # if line is not empty
-            if line.startswith(('A.', 'B.')):  # Section headers
-                if current_question:
-                    formatted_lines.append('\n'.join(current_question))
-                    formatted_lines.append('\n')
-                    current_question = []
-                formatted_lines.append(f"### {line}\n")
-            elif line[0].isdigit() and '. ' in line:  # New question
-                if current_question:
-                    formatted_lines.append('\n'.join(current_question))
-                    formatted_lines.append('\n')
-                    current_question = []
-                # Split the line at first colon if it exists
-                if ': ' in line:
-                    num, rest = line.split(': ', 1)
-                    current_question.append(f"\n**{num} Pertanyaan:** {rest}\n")
-                else:
-                    current_question.append(f"**{line}**\n")
-                in_question = True
-            elif line.lower().startswith('jawaban'):  # Answer line
-                in_question = False
-                current_question.append('\n**' + line + '**')
-            elif in_question and line[0].isalpha() and line[1] == '.':  # Options
-                current_question.append(f"\n{line}")  # Added newline before each option
-            else:  # Other content
-                current_question.append(f"\n{line}\n")
-    
-    # Add the last question if exists
-    if current_question:
-        formatted_lines.append('\n'.join(current_question))
-    
-    return '\n\n'.join(formatted_lines)
-
-def main():
-    st.title("HERD :owl:")
-    
-    # Sidebar untuk pengaturan
-    with st.sidebar:
-        st.header("Pengaturan")
-        
-        if st.button("Reset Chat"):
-            st.session_state.chat_session = None
-            st.experimental_rerun()
-            
-        # Debug info
-        if st.checkbox("Show Debug Info"):
-            st.write("Available secrets:", list(st.secrets.keys()))
-    
-    # Main content
-    st.write("Masukkan teks untuk generate soal:")
-    
-    # Text input area
-    user_input = st.text_area("Teks Input", height=200)
-    
-    # Generate button
-    if st.button("Generate Soal"):
-        if user_input:
-            try:
-                # Initialize model if not already done
-                if st.session_state.chat_session is None:
-                    st.session_state.chat_session = initialize_gemini()
-                    if st.session_state.chat_session is None:
-                        st.error("Gagal menginisialisasi model. Mohon periksa API key di Streamlit Secrets.")
-                        return
-                
-                # Prepare prompt
-                prompt = f"""
-                Berdasarkan teks berikut, buatkan soal-soal beserta jawabannya:
-
-                {user_input}
-
-                Buatkan kombinasi soal pilihan ganda dan esai singkat. 
-                Format output:
+    """Membuat respons lebih rapi
+    Hasilkan soal pilihan ganda dan esai dengan format rapi Pilihan jawaban pilihan ganda berada dibawah soal dan pisahkan antar pilihan dengan jarak 1 line.
+    Beri jarak 2 line antara soal dan jawaban esai.
+    Format output:
                 A. Soal Pilihan Ganda
                 1. [Pertanyaan]
                    a. [Pilihan A]
@@ -144,32 +68,58 @@ def main():
                 1. [Pertanyaan]
 
                    Jawaban: [Jawaban yang benar]
-                """
-                
-                # Generate response
-                response = st.session_state.chat_session.send_message(prompt)
-                
-                # Format and display response
-                formatted_response = format_response(response.text)
-                
-                # Display response
-                st.subheader("Hasil Generate:")
-                st.markdown(formatted_response)
-                
-                # Download button for results
-                st.download_button(
-                    label="Download Hasil",
-                    data=formatted_response,
-                    file_name="hasil_generate_soal.txt",
-                    mime="text/plain"
-                )
-                
-            except Exception as e:
-                st.error(f"Terjadi kesalahan: {str(e)}")
-                if "invalid api key" in str(e).lower():
-                    st.error("API Key tidak valid. Mohon periksa kembali API Key di Streamlit Secrets.")
-        else:
-            st.warning("Mohon masukkan teks terlebih dahulu!")
+    """
+    
+    return text
+
+def main():
+    st.title("HERD :owl:")
+
+    # Chat container as a placeholder to update in real-time
+    chat_container = st.empty()
+
+    # menampilkan chat history secara dinamis
+    with chat_container.container():
+        for chat in st.session_state.chat_history:
+            if isinstance(chat, dict) and "message" in chat:
+                if chat["role"] == "user":
+                    st.chat_message("user").markdown(chat["message"])
+                else:
+                    st.chat_message("assistant").markdown(format_response(chat["message"]))
+            else:
+                st.warning("Item chat tanpa kunci 'message' ditemukan.")
+
+    # Input area with st.chat_input
+    prompt = st.chat_input("Masukkan teks untuk generate soal...")
+    if prompt:
+        # Append user message to chat history
+        st.session_state.chat_history.append({"role": "user", "message": prompt})
+        
+        # Initialize the model if not yet initialized
+        if st.session_state.chat_session is None:
+            st.session_state.chat_session = initialize_gemini()
+            if st.session_state.chat_session is None:
+                st.error("Gagal menginisialisasi model.")
+                return
+        
+        try:
+            # Get response dari model
+            response = st.session_state.chat_session.send_message(prompt)
+            st.session_state.chat_history.append({"role": "assistant", "message": response.text})
+
+            # update otomatis chat setelah response
+            with chat_container.container():
+                for chat in st.session_state.chat_history:
+                    if isinstance(chat, dict) and "message" in chat:
+                        if chat["role"] == "user":
+                            st.chat_message("user").markdown(chat["message"])
+                        else:
+                            st.chat_message("assistant").markdown(format_response(chat["message"]))
+                    else:
+                        st.warning("Item chat tanpa kunci 'message' ditemukan.")
+        
+        except Exception as e:
+            st.error(f"Terjadi kesalahan: {str(e)}")
 
 if __name__ == "__main__":
     main()
