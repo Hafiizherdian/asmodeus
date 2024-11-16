@@ -28,7 +28,7 @@ def initialize_gemini():
             "temperature": 1,
             "top_p": 0.95,
             "top_k": 40,
-            "max_output_tokens": 2048,
+            "max_output_tokens":  4096,
         }
         
         # Create model
