@@ -62,12 +62,14 @@ def format_response(text):
                    c. [Pilihan C]
                    d. [Pilihan D]
 
-                   Jawaban: [Jawaban yang benar]
+                   
 
                 B. Soal Esai Singkat
                 1. [Pertanyaan]
 
-                   Jawaban: [Jawaban yang benar]
+                C. Kunci Jawaban
+                   Jawaban Pilihan Ganda: [Jawaban yang benar]
+                   Jawaban Pilihan Esai: [Jawaban yang benar]
     """
     
     return text
