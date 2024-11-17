@@ -38,17 +38,17 @@ def initialize_gemini():
             generation_config=generation_config,
         )
         
-        # Start chat with system prompt
+        # Start chat dengan system prompt
         chat = model.start_chat(history=[])
         chat.send_message(
         "Anda adalah asisten yang akan membuat soal pilihan ganda dan esai singkat berdasarkan teks yang diberikan. "
         "Berikan output dengan format:\n"
         "A. Soal Pilihan Ganda\n"
         "   1. [Pertanyaan]\n"
-        "      a. [Pilihan A]\n"
-        "      b. [Pilihan B]\n"
-        "      c. [Pilihan C]\n"
-        "      d. [Pilihan D]\n\n"
+        "       a). [Pilihan A]\n"
+        "       b). [Pilihan B]\n"
+        "       c). [Pilihan C]\n"
+        "       d). [Pilihan D]\n\n"
         "B. Soal Esai Singkat\n"
         "   1. [Pertanyaan]\n\n"
         "C. Kunci Jawaban\n"
@@ -69,13 +69,13 @@ def format_response(text):
     """
     Memformat respons model ke dalam format yang diinginkan.
     """
-    # Pisahkan setiap opsi jawaban (a., b., c., d.) ke baris baru
+    # Memisahkan setiap opsi jawaban (a., b., c., d.) ke baris baru
     formatted_text = re.sub(r'([a-d]\.)', r'\n\1', text.strip())
 
     # Tambahkan dua spasi di akhir setiap baris untuk mendukung line break di Markdown
     formatted_text = formatted_text.replace("\n", "  \n")
 
-    # Pisahkan bagian soal dan kunci jawaban
+    # Memisahkan bagian soal dan kunci jawaban
     soal_bagian = formatted_text.split("Kunci Jawaban:")
     soal_dan_jawaban = soal_bagian[0].strip()
     kunci_jawaban = soal_bagian[1].strip() if len(soal_bagian) > 1 else "Kunci jawaban tidak ditemukan."
@@ -93,7 +93,7 @@ def format_response(text):
 def main():
     st.title("HERD :owl:")
 
-    # Chat container as a placeholder to update in real-time
+    # Chat container sebagai placeholder untuk update secara real-time
     chat_container = st.empty()
 
     # menampilkan chat history secara dinamis
@@ -107,7 +107,7 @@ def main():
             else:
                 st.warning("Item chat tanpa kunci 'message' ditemukan.")
 
-    # Input area with st.chat_input
+    # Input area dengan st.chat_input
     prompt = st.chat_input("Masukkan teks untuk generate soal...")
     if prompt:
         # Append user message to chat history
