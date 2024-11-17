@@ -40,10 +40,24 @@ def initialize_gemini():
         # Start chat with system prompt
         chat = model.start_chat(history=[])
         chat.send_message(
-            "Anda adalah asisten yang akan generate pertanyaan dan jawaban berdasarkan teks yang diberikan. "
-            "Jenis pertanyaan dan jawaban bisa berupa pilihan ganda dan esai singkat. "
-            "Selalu berikan output dalam format yang rapi dengan nomor urut untuk setiap soal."
+        "Anda adalah asisten yang akan membuat soal pilihan ganda dan esai singkat berdasarkan teks yang diberikan. "
+        "Berikan output dengan format:\n"
+        "A. Soal Pilihan Ganda\n"
+        "   1. [Pertanyaan]\n"
+        "      a. [Pilihan A]\n"
+        "      b. [Pilihan B]\n"
+        "      c. [Pilihan C]\n"
+        "      d. [Pilihan D]\n\n"
+        "B. Soal Esai Singkat\n"
+        "   1. [Pertanyaan]\n\n"
+        "C. Kunci Jawaban\n"
+        "   Jawaban Pilihan Ganda:\n"
+        "   [Daftar jawaban yang benar, nomor dan huruf pilihan]\n"
+        "   Jawaban Esai Singkat:\n"
+        "   [Daftar jawaban esai singkat]\n\n"
+        "Berikan nomor urut untuk setiap soal dan pisahkan setiap bagian dengan jelas."
         )
+
         
         return chat
     except Exception as e:
@@ -51,30 +65,23 @@ def initialize_gemini():
         return None
 
 def format_response(text):
-    """Membuat respons lebih rapi
-    Hasilkan soal pilihan ganda dan esai dengan format rapi Pilihan jawaban pilihan ganda berada dibawah soal dan pisahkan antar pilihan dengan jarak 1 line.
-    Beri jarak 2 line antara soal dan jawaban esai.
-    Format output:
-                A. Soal Pilihan Ganda\n
-                1. [Pertanyaan]\n
-                   a. [Pilihan A]\n
-                   b. [Pilihan B]\n
-                   c. [Pilihan C]\n
-                   d. [Pilihan D]\n
+    """
+    Memformat respons model ke dalam format yang diinginkan.
+    """
+    # Pemisahan menjadi bagian-bagian jika respons memiliki pola tertentu
+    soal_bagian = text.split("Kunci Jawaban:")
+    soal_dan_jawaban = soal_bagian[0].strip()
+    kunci_jawaban = soal_bagian[1].strip() if len(soal_bagian) > 1 else "Kunci jawaban tidak ditemukan."
+    
+    # Format ulang menjadi output yang rapi
+    return f"""
+    **Soal Pilihan Ganda dan Esai**
+    {soal_dan_jawaban}
 
-                   
-
-                B. Soal Esai Singkat\n
-                1. [Pertanyaan]\n
-
-                C. Kunci Jawaban\n
-                   Jawaban Pilihan Ganda:\n 
-                   [Jawaban yang benar]\n
-                   Jawaban Pilihan Esai:\n 
-                   [Jawaban yang benar]\n
+    **Kunci Jawaban**
+    {kunci_jawaban}
     """
     
-    return text
 
 def main():
     st.title("HERD :owl:")
