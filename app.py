@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import re
 
 # Set page config
 st.set_page_config(page_title="Implementasi AI Generate butir soal otomatis", layout="wide")
@@ -68,17 +69,23 @@ def format_response(text):
     """
     Memformat respons model ke dalam format yang diinginkan.
     """
-    # Pemisahan menjadi bagian-bagian jika respons memiliki pola tertentu
-    soal_bagian = text.split("Kunci Jawaban:")
+    # Pisahkan setiap opsi jawaban (a., b., c., d.) ke baris baru
+    formatted_text = re.sub(r'([a-d]\.)', r'\n\1', text.strip())
+
+    # Tambahkan dua spasi di akhir setiap baris untuk mendukung line break di Markdown
+    formatted_text = formatted_text.replace("\n", "  \n")
+
+    # Pisahkan bagian soal dan kunci jawaban
+    soal_bagian = formatted_text.split("Kunci Jawaban:")
     soal_dan_jawaban = soal_bagian[0].strip()
     kunci_jawaban = soal_bagian[1].strip() if len(soal_bagian) > 1 else "Kunci jawaban tidak ditemukan."
-    
-    # Format ulang menjadi output yang rapi
-    return f"""
-    **Soal Pilihan Ganda dan Esai**
-    {soal_dan_jawaban}
 
-    **Kunci Jawaban**
+    # Format ulang menjadi output rapi
+    return f"""
+    **Soal Pilihan Ganda dan Esai**  
+    {soal_dan_jawaban}  
+
+    **Kunci Jawaban**  
     {kunci_jawaban}
     """
     
