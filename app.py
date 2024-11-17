@@ -38,7 +38,7 @@ def initialize_gemini():
             generation_config=generation_config,
         )
         
-        # Start chat dengan system prompt
+        # Start chat dengan systems prompt
         chat = model.start_chat(history=[])
         chat.send_message(
         "Anda adalah asisten yang akan membuat soal pilihan ganda dan esai singkat berdasarkan teks yang diberikan. "
