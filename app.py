@@ -70,7 +70,7 @@ def format_response(text):
     Memformat respons model ke dalam format yang diinginkan.
     """
     # Memisahkan setiap opsi jawaban (a., b., c., d.) ke baris baru
-    formatted_text = re.sub(r'([a-d]\.)', r'\n\1', text.strip())
+    formatted_text = re.sub(r'([A-D]\.)', r'\n\1', text.strip())
 
     # Tambahkan dua spasi di akhir setiap baris untuk mendukung line break di Markdown
     formatted_text = formatted_text.replace("\n", "  \n")
